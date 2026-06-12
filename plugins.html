@@ -45,19 +45,16 @@
     .search-bar{
       display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap
     }
-    .search-bar input{
-      flex:1;min-width:200px;padding:12px 16px;border-radius:var(--radius-sm);
+    .search-bar input,.search-bar select{
+      padding:12px 16px;border-radius:var(--radius-sm);
       border:1px solid var(--border);background:var(--bg2);color:var(--text);
       font-size:14px;font-family:inherit;outline:none;transition:border-color .2s
     }
-    .search-bar input:focus{border-color:var(--accent)}
+    .search-bar input:focus,.search-bar select:focus{border-color:var(--accent)}
     .search-bar input::placeholder{color:var(--text-dim)}
-    .search-bar select{
-      padding:12px 16px;border-radius:var(--radius-sm);
-      border:1px solid var(--border);background:var(--bg2);color:var(--text);
-      font-size:14px;font-family:inherit;outline:none;cursor:pointer
-    }
-    .search-bar select:focus{border-color:var(--accent)}
+    .search-bar select{cursor:pointer}
+    .search-bar .text-flex{flex:1;min-width:200px}
+    .search-bar .text-flex input{width:100%}
 
     .plugin-count{font-size:14px;color:var(--text-dim);margin-bottom:20px}
 
@@ -94,20 +91,58 @@
       color:var(--text-dim);cursor:pointer;transition:all .2s;font-family:inherit
     }
     .plugin-card .install-bar .copy-btn:hover{color:var(--text);border-color:var(--accent)}
+    .plugin-card .actions{display:flex;gap:8px;margin-top:8px}
+    .plugin-card .actions button{
+      flex:1;padding:6px 12px;font-size:12px;font-weight:600;
+      border-radius:4px;cursor:pointer;transition:all .2s;font-family:inherit
+    }
+    .plugin-card .edit-btn{
+      background:transparent;border:1px solid var(--accent);color:var(--accent)
+    }
+    .plugin-card .edit-btn:hover{background:rgba(192,132,252,.1)}
     .plugin-card .del-btn{
-      margin-top:8px;padding:6px 12px;font-size:12px;font-weight:600;
-      background:transparent;border:1px solid var(--red);border-radius:4px;
-      color:var(--red);cursor:pointer;transition:all .2s;font-family:inherit
+      background:transparent;border:1px solid var(--red);color:var(--red)
     }
     .plugin-card .del-btn:hover{background:rgba(248,113,113,.1)}
 
     .empty{text-align:center;padding:60px 0;color:var(--text-dim)}
     .empty p{font-size:16px;margin-bottom:8px}
 
+    /* Modal */
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.7);
+      display:flex;align-items:center;justify-content:center;
+      z-index:200;padding:24px
+    }
+    .modal{
+      background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+      padding:32px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto
+    }
+    .modal h2{font-size:20px;font-weight:600;margin-bottom:4px}
+    .modal .sub{font-size:14px;color:var(--text-dim);margin-bottom:20px}
+    .modal .form-group{margin-bottom:14px}
+    .modal .form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:4px;color:var(--text-dim)}
+    .modal .form-group input,.modal .form-group textarea,.modal .form-group select{
+      width:100%;padding:10px 14px;border-radius:var(--radius-sm);
+      border:1px solid var(--border);background:var(--bg3);color:var(--text);
+      font-size:14px;font-family:inherit;outline:none;transition:border-color .2s
+    }
+    .modal .form-group input:focus,.modal .form-group textarea:focus{border-color:var(--accent)}
+    .modal .form-group textarea{resize:vertical;min-height:70px}
+    .modal .btn-group{display:flex;gap:10px;margin-top:20px}
+    .modal .btn{
+      padding:10px 24px;border-radius:var(--radius-sm);font-weight:600;
+      font-size:14px;cursor:pointer;transition:all .2s;border:none;font-family:inherit
+    }
+    .modal .btn-primary{background:var(--accent);color:#0a0a0f}
+    .modal .btn-primary:hover{background:var(--accent-dim)}
+    .modal .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+    .modal .btn-secondary:hover{border-color:var(--accent)}
+
     .toast{
       position:fixed;bottom:24px;right:24px;padding:12px 20px;
       border-radius:var(--radius-sm);font-size:14px;font-weight:500;
-      z-index:100;animation:fadeIn .3s;max-width:400px
+      z-index:300;animation:fadeIn .3s;max-width:400px
     }
     .toast.success{background:rgba(74,222,128,.15);border:1px solid var(--green);color:var(--green)}
     .toast.error{background:rgba(248,113,113,.15);border:1px solid var(--red);color:var(--red)}
@@ -139,15 +174,20 @@
   </div>
 
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search plugins..." oninput="renderPlugins()">
+    <div class="text-flex">
+      <input type="text" id="searchInput" placeholder="Search name, author, description..." oninput="renderPlugins()">
+    </div>
+    <select id="tagFilter" onchange="onTagFilterChange()">
+      <option value="__all__">everything</option>
+      <option value="__mine__">made by me</option>
+      <option value="__search__">search</option>
+    </select>
+    <input type="text" id="tagSearch" placeholder="custom tag..." style="display:none;max-width:160px" oninput="renderPlugins()">
     <select id="langFilter" onchange="renderPlugins()">
       <option value="">All languages</option>
       <option value="python">Python</option>
       <option value="bash">Bash</option>
       <option value="shell">Shell</option>
-    </select>
-    <select id="tagFilter" onchange="renderPlugins()">
-      <option value="">All tags</option>
     </select>
   </div>
 
@@ -195,10 +235,19 @@ function populateTagFilter() {
   });
 }
 
+function onTagFilterChange() {
+  const val = document.getElementById('tagFilter').value;
+  const tagSearch = document.getElementById('tagSearch');
+  tagSearch.style.display = val === '__search__' ? 'block' : 'none';
+  if (val !== '__search__') tagSearch.value = '';
+  renderPlugins();
+}
+
 function renderPlugins() {
   const query = document.getElementById('searchInput').value.toLowerCase();
   const lang = document.getElementById('langFilter').value;
-  const tag = document.getElementById('tagFilter').value;
+  const tagFilterVal = document.getElementById('tagFilter').value;
+  const tagCustom = document.getElementById('tagSearch').value.trim().toLowerCase();
 
   const filtered = plugins.filter(p => {
     const matchSearch = !query ||
@@ -206,8 +255,18 @@ function renderPlugins() {
       (p.description || '').toLowerCase().includes(query) ||
       (p.author || '').toLowerCase().includes(query) ||
       (p.tags || []).some(t => t.toLowerCase().includes(query));
+
     const matchLang = !lang || (p.language || '').toLowerCase() === lang;
-    const matchTag = !tag || (p.tags || []).includes(tag);
+
+    let matchTag = true;
+    if (tagFilterVal === '__mine__') {
+      matchTag = currentUser && p.author === currentUser.username;
+    } else if (tagFilterVal === '__search__') {
+      matchTag = !tagCustom || (p.tags || []).some(t => t.toLowerCase().includes(tagCustom));
+    } else if (tagFilterVal && tagFilterVal !== '__all__') {
+      matchTag = (p.tags || []).includes(tagFilterVal);
+    }
+
     return matchSearch && matchLang && matchTag;
   });
 
@@ -224,6 +283,8 @@ function renderPlugins() {
   }
   empty.style.display = 'none';
 
+  const canEdit = p => currentUser && (currentUser.username === 'guyka2212' || p.author === currentUser.username);
+
   grid.innerHTML = filtered.map(p => `
     <div class="plugin-card">
       <div class="top">
@@ -237,7 +298,7 @@ function renderPlugins() {
         <code>${p.install_cmd || 'gita run PlugInstall ' + p.url + ' ' + p.name}</code>
         <button class="copy-btn" onclick="copyInstall('${(p.install_cmd || 'gita run PlugInstall ' + p.url + ' ' + p.name).replace(/'/g, "\\'")}', this)">Copy</button>
       </div>
-      ${currentUser && currentUser.username === 'guyka2212' ? `<button class="del-btn" onclick="deletePlugin('${p.name}')">Delete</button>` : ''}
+      ${canEdit(p) ? `<div class="actions"><button class="edit-btn" onclick="openEditModal('${p.name}')">Edit</button><button class="del-btn" onclick="deletePlugin('${p.name}')">Delete</button></div>` : ''}
     </div>
   `).join('');
 }
@@ -249,6 +310,116 @@ function copyInstall(cmd, btn) {
   });
 }
 
+let editingPlugin = null;
+
+function openEditModal(name) {
+  const p = plugins.find(x => x.name === name);
+  if (!p) return;
+  editingPlugin = p;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'editModal';
+  overlay.onclick = e => { if (e.target === overlay) closeEditModal(); };
+
+  overlay.innerHTML = `
+    <div class="modal">
+      <h2>Edit plugin</h2>
+      <p class="sub">Update the details for <strong>${p.name}</strong>.</p>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="editName" value="${p.name}">
+      </div>
+      <div class="form-group">
+        <label>Version</label>
+        <input type="text" id="editVersion" value="${p.version || '1.0.0'}">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="editDesc">${p.description || ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Language</label>
+        <select id="editLang">
+          <option value="bash" ${p.language === 'bash' ? 'selected' : ''}>Bash</option>
+          <option value="python" ${p.language === 'python' ? 'selected' : ''}>Python</option>
+          <option value="shell" ${p.language === 'shell' ? 'selected' : ''}>Shell</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Raw URL</label>
+        <input type="url" id="editUrl" value="${p.url || ''}">
+      </div>
+      <div class="form-group">
+        <label>Tags (comma-separated)</label>
+        <input type="text" id="editTags" value="${(p.tags || []).join(', ')}">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="saveEdit()">Save</button>
+        <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function closeEditModal() {
+  const el = document.getElementById('editModal');
+  if (el) el.remove();
+  editingPlugin = null;
+}
+
+async function saveEdit() {
+  if (!editingPlugin) return;
+  const origName = editingPlugin.name;
+
+  const updated = {
+    ...editingPlugin,
+    name: document.getElementById('editName').value.trim(),
+    version: document.getElementById('editVersion').value.trim() || '1.0.0',
+    description: document.getElementById('editDesc').value.trim(),
+    language: document.getElementById('editLang').value,
+    url: document.getElementById('editUrl').value.trim(),
+    tags: document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(Boolean)
+  };
+  updated.install_cmd = `gita run PlugInstall ${updated.url} ${updated.name}`;
+
+  const idx = plugins.findIndex(p => p.name === origName);
+  if (idx === -1) return;
+  plugins[idx] = updated;
+
+  const token = localStorage.getItem('gita_token');
+  if (!token) {
+    showToast('No GitHub token. Edit saved locally only.', 'error');
+    closeEditModal();
+    renderPlugins();
+    return;
+  }
+
+  try {
+    const getRes = await fetch('https://api.github.com/repos/guyka2212/gita-site/contents/plugins.json', {
+      headers: { Authorization: `token ${token}` }
+    });
+    if (!getRes.ok) throw new Error('Failed to fetch file');
+    const file = await getRes.json();
+    const content = JSON.stringify({ plugins }, null, 2);
+    const encoded = btoa(unescape(encodeURIComponent(content)));
+
+    await fetch('https://api.github.com/repos/guyka2212/gita-site/contents/plugins.json', {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Edit plugin ${updated.name}`, content: encoded, sha: file.sha })
+    });
+
+    showToast('Plugin updated!', 'success');
+  } catch (e) {
+    showToast('Failed to save to GitHub. Check your token.', 'error');
+  }
+
+  closeEditModal();
+  renderPlugins();
+}
+
 async function deletePlugin(name) {
   if (!confirm(`Delete plugin "${name}"? This cannot be undone.`)) return;
 
@@ -256,7 +427,7 @@ async function deletePlugin(name) {
 
   const token = localStorage.getItem('gita_token');
   if (!token) {
-    showToast('No GitHub token found. Log in again.', 'error');
+    showToast('No GitHub token found. Log in with a token.', 'error');
     return;
   }
 
@@ -271,11 +442,7 @@ async function deletePlugin(name) {
     await fetch('https://api.github.com/repos/guyka2212/gita-site/contents/plugins.json', {
       method: 'PUT',
       headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: `Delete plugin ${name}`,
-        content: encoded,
-        sha: file.sha
-      })
+      body: JSON.stringify({ message: `Delete plugin ${name}`, content: encoded, sha: file.sha })
     });
 
     showToast(`Plugin "${name}" deleted.`, 'success');
