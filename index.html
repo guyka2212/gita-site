@@ -241,6 +241,16 @@
 </head>
 <body>
 
+<nav style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border);max-width:1008px;margin:0 auto">
+  <a href="index.html" style="font-weight:700;font-size:18px;color:var(--text);text-decoration:none">🐙 <span style="color:var(--accent)">Gita</span></a>
+  <div>
+    <a href="index.html" style="margin-left:20px;font-size:14px;font-weight:500;color:var(--text-dim);text-decoration:none">Home</a>
+    <a href="plugins.html" style="margin-left:20px;font-size:14px;font-weight:500;color:var(--text-dim);text-decoration:none">Plugins</a>
+    <a href="account.html" style="margin-left:20px;font-size:14px;font-weight:500;color:var(--text-dim);text-decoration:none">Account</a>
+    <a href="https://github.com/guyka2212/gita" style="margin-left:20px;font-size:14px;font-weight:500;color:var(--text-dim);text-decoration:none">GitHub</a>
+  </div>
+</nav>
+
 <header class="hero">
   <div class="container">
     <div class="ascii">
@@ -256,7 +266,7 @@
     <div class="btn-group">
       <a href="#install" class="btn btn-primary">Get Started</a>
       <a href="#commands" class="btn btn-secondary">View Commands</a>
-      <a href="#plugins" class="btn btn-secondary">Plugins</a>
+      <a href="plugins.html" class="btn btn-secondary">Browse Plugins</a>
       <a href="https://github.com/guyka2212/gita" class="btn btn-secondary" target="_blank">GitHub</a>
     </div>
   </div>
@@ -384,6 +394,11 @@
           <td class="cmd"><code>gita run &lt;name&gt;</code></td>
           <td class="desc">Execute a script from <code>~/.gita/scripts/</code></td>
         </tr>
+        <tr>
+          <td class="action">Install plugin</td>
+          <td class="cmd"><code>gita run PlugInstall &lt;url&gt; &lt;name&gt;</code></td>
+          <td class="desc">Download and install a plugin from a raw URL</td>
+        </tr>
       </tbody>
     </table>
 
@@ -466,13 +481,14 @@ gita run deploy</pre>
     <div class="section-label">Plugins</div>
     <h2 class="section-title">Plugin developer guide</h2>
     <p class="section-desc">Because the Gita engine uses an extensionless runner system, you can easily build, install, and share plugins using Bash, Python, or any scripting language.</p>
+    <p style="margin-bottom:24px"><a href="plugins.html" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:8px;font-weight:600;font-size:14px;background:var(--accent);color:#0a0a0f;text-decoration:none">Browse the plugin registry →</a></p>
 
     <h3 style="font-size:20px;font-weight:600;margin-bottom:16px">📥 How to install plugins</h3>
 
     <div class="detail">
       <h4>Method A: Automated installer</h4>
-      <p>If your Gita configuration includes <code>install-plugin</code>, install any remote script instantly from a raw URL:</p>
-      <pre>gita install-plugin https://raw.githubusercontent.com/username/repo/main/my-plugin my-plugin</pre>
+      <p>Use the built-in <code>PlugInstall</code> script to install any plugin from a raw URL:</p>
+      <pre>gita run PlugInstall https://raw.githubusercontent.com/username/repo/main/my-plugin my-plugin</pre>
     </div>
 
     <div class="detail">
@@ -570,10 +586,11 @@ print(f"Storage Remaining: {free_gb} GB Available")</pre>
   <div class="container">
     <p>Built by <a href="https://github.com/guyka2212" target="_blank">guyka2212</a></p>
     <p style="margin-top:8px">
-      <a href="#install">Install</a> •
-      <a href="#commands">Commands</a> •
-      <a href="#plugins">Plugins</a> •
-      <a href="#extending">Extending</a> •
+      <a href="index.html#install">Install</a> •
+      <a href="index.html#commands">Commands</a> •
+      <a href="plugins.html">Plugins</a> •
+      <a href="account.html">Account</a> •
+      <a href="index.html#extending">Extending</a> •
       <a href="https://github.com/guyka2212/gita" target="_blank">GitHub</a>
     </p>
   </div>

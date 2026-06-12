@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plugins — Gita</title>
+  <meta name="description" content="Browse and search Gita plugins. Install any plugin with a single command.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg: #0a0a0f; --bg2: #12121a; --bg3: #1c1c28;
+      --border: #2a2a3e; --text: #e2e2f0; --text-dim: #8888a0;
+      --accent: #c084fc; --accent-dim: #a855f7; --green: #4ade80;
+      --cyan: #22d3ee; --orange: #fb923c; --red: #f87171;
+      --radius: 12px; --radius-sm: 8px;
+    }
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Inter',system-ui,-apple-system,sans-serif;
+      background:var(--bg);color:var(--text);line-height:1.6;
+      -webkit-font-smoothing:antialiased
+    }
+    .container{max-width:960px;margin:0 auto;padding:0 24px}
+    a{color:var(--accent);text-decoration:none;transition:color .2s}
+    a:hover{color:var(--accent-dim)}
+    pre,code,.mono{font-family:'JetBrains Mono',monospace}
+
+    nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 24px;border-bottom:1px solid var(--border);
+      max-width:1008px;margin:0 auto
+    }
+    nav .brand{font-weight:700;font-size:18px;color:var(--text)}
+    nav .brand span{color:var(--accent)}
+    nav a{margin-left:20px;font-size:14px;font-weight:500;color:var(--text-dim)}
+    nav a:hover{color:var(--accent)}
+
+    .page-header{padding:48px 0 32px}
+    .page-header h1{font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+    .page-header h1 span{color:var(--accent)}
+    .page-header p{color:var(--text-dim);font-size:16px}
+
+    .search-bar{
+      display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap
+    }
+    .search-bar input{
+      flex:1;min-width:200px;padding:12px 16px;border-radius:var(--radius-sm);
+      border:1px solid var(--border);background:var(--bg2);color:var(--text);
+      font-size:14px;font-family:inherit;outline:none;transition:border-color .2s
+    }
+    .search-bar input:focus{border-color:var(--accent)}
+    .search-bar input::placeholder{color:var(--text-dim)}
+    .search-bar select{
+      padding:12px 16px;border-radius:var(--radius-sm);
+      border:1px solid var(--border);background:var(--bg2);color:var(--text);
+      font-size:14px;font-family:inherit;outline:none;cursor:pointer
+    }
+    .search-bar select:focus{border-color:var(--accent)}
+
+    .plugin-count{font-size:14px;color:var(--text-dim);margin-bottom:20px}
+
+    .plugin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+
+    .plugin-card{
+      background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+      padding:24px;transition:border-color .2s;display:flex;flex-direction:column
+    }
+    .plugin-card:hover{border-color:var(--accent)}
+    .plugin-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+    .plugin-card .name{font-size:18px;font-weight:600}
+    .plugin-card .version{
+      font-size:11px;color:var(--text-dim);background:var(--bg3);
+      padding:2px 8px;border-radius:100px
+    }
+    .plugin-card .author{font-size:13px;color:var(--text-dim);margin-bottom:8px}
+    .plugin-card .author a{color:var(--accent)}
+    .plugin-card .desc{font-size:14px;color:var(--text-dim);margin-bottom:16px;flex:1}
+    .plugin-card .tags{margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px}
+    .plugin-card .tag{
+      font-size:11px;padding:2px 10px;border-radius:100px;
+      background:var(--bg3);color:var(--cyan);font-weight:500
+    }
+    .plugin-card .install-bar{
+      background:var(--bg3);border-radius:var(--radius-sm);
+      padding:10px 14px;font-size:13px;display:flex;align-items:center;
+      justify-content:space-between;gap:8px;border:1px solid var(--border)
+    }
+    .plugin-card .install-bar code{font-size:12px;color:var(--green);word-break:break-all}
+    .plugin-card .install-bar .copy-btn{
+      flex-shrink:0;padding:4px 10px;font-size:11px;font-weight:600;
+      background:var(--bg2);border:1px solid var(--border);border-radius:4px;
+      color:var(--text-dim);cursor:pointer;transition:all .2s;font-family:inherit
+    }
+    .plugin-card .install-bar .copy-btn:hover{color:var(--text);border-color:var(--accent)}
+    .plugin-card .del-btn{
+      margin-top:8px;padding:6px 12px;font-size:12px;font-weight:600;
+      background:transparent;border:1px solid var(--red);border-radius:4px;
+      color:var(--red);cursor:pointer;transition:all .2s;font-family:inherit
+    }
+    .plugin-card .del-btn:hover{background:rgba(248,113,113,.1)}
+
+    .empty{text-align:center;padding:60px 0;color:var(--text-dim)}
+    .empty p{font-size:16px;margin-bottom:8px}
+
+    .toast{
+      position:fixed;bottom:24px;right:24px;padding:12px 20px;
+      border-radius:var(--radius-sm);font-size:14px;font-weight:500;
+      z-index:100;animation:fadeIn .3s;max-width:400px
+    }
+    .toast.success{background:rgba(74,222,128,.15);border:1px solid var(--green);color:var(--green)}
+    .toast.error{background:rgba(248,113,113,.15);border:1px solid var(--red);color:var(--red)}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    @media(max-width:640px){
+      nav a{margin-left:12px;font-size:13px}
+      .page-header h1{font-size:28px}
+      .search-bar select{width:100%}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="brand">🐙 <span>Gita</span></a>
+  <div>
+    <a href="index.html">Home</a>
+    <a href="plugins.html">Plugins</a>
+    <a href="account.html">Account</a>
+    <a href="https://github.com/guyka2212/gita">GitHub</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>🔌 <span>Plugins</span></h1>
+    <p>Browse, search, and install community plugins for Gita.</p>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search plugins..." oninput="renderPlugins()">
+    <select id="langFilter" onchange="renderPlugins()">
+      <option value="">All languages</option>
+      <option value="python">Python</option>
+      <option value="bash">Bash</option>
+      <option value="shell">Shell</option>
+    </select>
+    <select id="tagFilter" onchange="renderPlugins()">
+      <option value="">All tags</option>
+    </select>
+  </div>
+
+  <div class="plugin-count" id="pluginCount"></div>
+  <div class="plugin-grid" id="pluginGrid"></div>
+  <div class="empty" id="emptyState" style="display:none">
+    <p>No plugins match your search.</p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let plugins = [];
+let currentUser = null;
+
+async function loadData() {
+  try {
+    const res = await fetch('plugins.json');
+    const data = await res.json();
+    plugins = data.plugins || [];
+
+    const userData = localStorage.getItem('gita_user');
+    if (userData) {
+      currentUser = JSON.parse(userData);
+    }
+
+    populateTagFilter();
+    renderPlugins();
+  } catch (e) {
+    document.getElementById('pluginGrid').innerHTML =
+      '<div class="empty"><p>Failed to load plugins.</p></div>';
+  }
+}
+
+function populateTagFilter() {
+  const tags = new Set();
+  plugins.forEach(p => (p.tags || []).forEach(t => tags.add(t)));
+  const sel = document.getElementById('tagFilter');
+  tags.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    sel.appendChild(opt);
+  });
+}
+
+function renderPlugins() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const lang = document.getElementById('langFilter').value;
+  const tag = document.getElementById('tagFilter').value;
+
+  const filtered = plugins.filter(p => {
+    const matchSearch = !query ||
+      p.name.toLowerCase().includes(query) ||
+      (p.description || '').toLowerCase().includes(query) ||
+      (p.author || '').toLowerCase().includes(query) ||
+      (p.tags || []).some(t => t.toLowerCase().includes(query));
+    const matchLang = !lang || (p.language || '').toLowerCase() === lang;
+    const matchTag = !tag || (p.tags || []).includes(tag);
+    return matchSearch && matchLang && matchTag;
+  });
+
+  document.getElementById('pluginCount').textContent =
+    `${filtered.length} plugin${filtered.length !== 1 ? 's' : ''} found`;
+
+  const grid = document.getElementById('pluginGrid');
+  const empty = document.getElementById('emptyState');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = filtered.map(p => `
+    <div class="plugin-card">
+      <div class="top">
+        <span class="name">${p.name}</span>
+        <span class="version">v${p.version || '1.0.0'}</span>
+      </div>
+      <div class="author">by <a href="https://github.com/${p.author}" target="_blank">${p.author}</a></div>
+      <div class="desc">${p.description || ''}</div>
+      ${(p.tags || []).length ? `<div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+      <div class="install-bar">
+        <code>${p.install_cmd || 'gita run PlugInstall ' + p.url + ' ' + p.name}</code>
+        <button class="copy-btn" onclick="copyInstall('${(p.install_cmd || 'gita run PlugInstall ' + p.url + ' ' + p.name).replace(/'/g, "\\'")}', this)">Copy</button>
+      </div>
+      ${currentUser && currentUser.username === 'guyka2212' ? `<button class="del-btn" onclick="deletePlugin('${p.name}')">Delete</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function copyInstall(cmd, btn) {
+  navigator.clipboard.writeText(cmd).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+async function deletePlugin(name) {
+  if (!confirm(`Delete plugin "${name}"? This cannot be undone.`)) return;
+
+  plugins = plugins.filter(p => p.name !== name);
+
+  const token = localStorage.getItem('gita_token');
+  if (!token) {
+    showToast('No GitHub token found. Log in again.', 'error');
+    return;
+  }
+
+  try {
+    const getRes = await fetch('https://api.github.com/repos/guyka2212/gita-site/contents/plugins.json', {
+      headers: { Authorization: `token ${token}` }
+    });
+    const file = await getRes.json();
+    const content = JSON.stringify({ plugins }, null, 2);
+    const encoded = btoa(unescape(encodeURIComponent(content)));
+
+    await fetch('https://api.github.com/repos/guyka2212/gita-site/contents/plugins.json', {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: `Delete plugin ${name}`,
+        content: encoded,
+        sha: file.sha
+      })
+    });
+
+    showToast(`Plugin "${name}" deleted.`, 'success');
+    renderPlugins();
+  } catch (e) {
+    showToast('Failed to delete. Check your token.', 'error');
+  }
+}
+
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type;
+  setTimeout(() => { el.className = 'toast'; }, 3000);
+}
+
+loadData();
+</script>
+
+</body>
+</html>

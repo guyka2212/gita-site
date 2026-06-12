@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account — Gita</title>
+  <meta name="description" content="Sign up, log in, and publish your own Gita plugins.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg: #0a0a0f; --bg2: #12121a; --bg3: #1c1c28;
+      --border: #2a2a3e; --text: #e2e2f0; --text-dim: #8888a0;
+      --accent: #c084fc; --accent-dim: #a855f7; --green: #4ade80;
+      --cyan: #22d3ee; --orange: #fb923c; --red: #f87171;
+      --radius: 12px; --radius-sm: 8px;
+    }
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Inter',system-ui,-apple-system,sans-serif;
+      background:var(--bg);color:var(--text);line-height:1.6;
+      -webkit-font-smoothing:antialiased
+    }
+    .container{max-width:960px;margin:0 auto;padding:0 24px}
+    a{color:var(--accent);text-decoration:none;transition:color .2s}
+    a:hover{color:var(--accent-dim)}
+    pre,code,.mono{font-family:'JetBrains Mono',monospace}
+
+    nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 24px;border-bottom:1px solid var(--border);
+      max-width:1008px;margin:0 auto
+    }
+    nav .brand{font-weight:700;font-size:18px;color:var(--text)}
+    nav .brand span{color:var(--accent)}
+    nav a{margin-left:20px;font-size:14px;font-weight:500;color:var(--text-dim)}
+    nav a:hover{color:var(--accent)}
+
+    .page-header{padding:48px 0 32px}
+    .page-header h1{font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+    .page-header h1 span{color:var(--accent)}
+    .page-header p{color:var(--text-dim);font-size:16px}
+
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:48px}
+    @media(max-width:700px){.split{grid-template-columns:1fr}}
+
+    .card{
+      background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+      padding:28px
+    }
+    .card h2{font-size:20px;font-weight:600;margin-bottom:4px}
+    .card .sub{font-size:14px;color:var(--text-dim);margin-bottom:20px}
+
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text-dim)}
+    .form-group input,.form-group textarea,.form-group select{
+      width:100%;padding:10px 14px;border-radius:var(--radius-sm);
+      border:1px solid var(--border);background:var(--bg3);color:var(--text);
+      font-size:14px;font-family:inherit;outline:none;transition:border-color .2s
+    }
+    .form-group input:focus,.form-group textarea:focus{border-color:var(--accent)}
+    .form-group textarea{resize:vertical;min-height:80px}
+
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:10px 24px;border-radius:var(--radius-sm);
+      font-weight:600;font-size:14px;transition:all .2s;cursor:pointer;border:none;font-family:inherit
+    }
+    .btn-primary{background:var(--accent);color:#0a0a0f}
+    .btn-primary:hover{background:var(--accent-dim)}
+    .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-danger{background:transparent;border:1px solid var(--red);color:var(--red)}
+    .btn-danger:hover{background:rgba(248,113,113,.1)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+
+    .badge{
+      display:inline-block;padding:2px 10px;border-radius:100px;
+      font-size:11px;font-weight:700;text-transform:uppercase
+    }
+    .badge.admin{background:rgba(251,191,36,.15);color:var(--orange)}
+    .badge.user{background:rgba(74,222,128,.15);color:var(--green)}
+
+    .user-info{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+    .user-info .avatar{
+      width:48px;height:48px;border-radius:50%;background:var(--bg3);
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;font-weight:700;color:var(--accent);border:2px solid var(--border)
+    }
+
+    .publish-section{margin-top:32px;border-top:1px solid var(--border);padding-top:28px}
+    .publish-section h3{font-size:18px;font-weight:600;margin-bottom:4px}
+
+    .status-msg{
+      margin-top:12px;padding:10px 14px;border-radius:var(--radius-sm);
+      font-size:13px;display:none
+    }
+    .status-msg.success{display:block;background:rgba(74,222,128,.1);border:1px solid var(--green);color:var(--green)}
+    .status-msg.error{display:block;background:rgba(248,113,113,.1);border:1px solid var(--red);color:var(--red)}
+
+    @media(max-width:640px){
+      nav a{margin-left:12px;font-size:13px}
+      .page-header h1{font-size:28px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="brand">🐙 <span>Gita</span></a>
+  <div>
+    <a href="index.html">Home</a>
+    <a href="plugins.html">Plugins</a>
+    <a href="account.html">Account</a>
+    <a href="https://github.com/guyka2212/gita">GitHub</a>
+  </div>
+</nav>
+
+<div class="container" id="app">
+  <div class="page-header">
+    <h1>👤 <span>Account</span></h1>
+    <p>Sign up, log in, and publish your own Gita plugins.</p>
+  </div>
+
+  <!-- Not logged in -->
+  <div id="guestView">
+    <div class="split">
+      <div class="card">
+        <h2>Log in</h2>
+        <p class="sub">Access your account to manage plugins.</p>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="loginUser" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="Enter your password">
+        </div>
+        <div class="form-group">
+          <label>GitHub Token (optional — needed to publish/delete)</label>
+          <input type="password" id="loginToken" placeholder="ghp_...">
+        </div>
+        <button class="btn btn-primary" onclick="login()">Log in</button>
+        <div id="loginStatus" class="status-msg"></div>
+      </div>
+
+      <div class="card">
+        <h2>Sign up</h2>
+        <p class="sub">Create an account to publish plugins.</p>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="signupUser" placeholder="Choose a username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signupPass" placeholder="Choose a password">
+        </div>
+        <div class="form-group">
+          <label>Confirm password</label>
+          <input type="password" id="signupConfirm" placeholder="Confirm your password">
+        </div>
+        <button class="btn btn-primary" onclick="signup()">Sign up</button>
+        <div id="signupStatus" class="status-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logged in -->
+  <div id="userView" style="display:none">
+    <div class="card">
+      <div class="user-info">
+        <div class="avatar" id="userAvatar">G</div>
+        <div>
+          <div style="font-weight:600;font-size:16px" id="userName">user</div>
+          <div><span class="badge user" id="userBadge">user</span></div>
+        </div>
+        <button class="btn btn-secondary" onclick="logout()" style="margin-left:auto">Log out</button>
+      </div>
+
+      <div class="publish-section">
+        <h3>📦 Publish a plugin</h3>
+        <p class="sub">Submit your plugin to the Gita registry.</p>
+        <div class="form-group">
+          <label>Plugin name</label>
+          <input type="text" id="pubName" placeholder="my-plugin">
+        </div>
+        <div class="form-group">
+          <label>Version</label>
+          <input type="text" id="pubVersion" placeholder="1.0.0">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="pubDesc" placeholder="What does your plugin do?"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Language</label>
+          <select id="pubLang">
+            <option value="bash">Bash</option>
+            <option value="python">Python</option>
+            <option value="shell">Shell</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Raw URL (direct download link to your script)</label>
+          <input type="url" id="pubUrl" placeholder="https://raw.githubusercontent.com/.../my-plugin">
+        </div>
+        <div class="form-group">
+          <label>Tags (comma-separated)</label>
+          <input type="text" id="pubTags" placeholder="network, sync, backup">
+        </div>
+        <button class="btn btn-primary" onclick="publishPlugin()">Submit plugin</button>
+        <div id="publishStatus" class="status-msg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentUser = null;
+
+function loadState() {
+  const data = localStorage.getItem('gita_user');
+  if (data) {
+    currentUser = JSON.parse(data);
+    showUserView();
+  }
+}
+
+function showToast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  Object.assign(el.style, {
+    position: 'fixed', bottom: '24px', right: '24px',
+    padding: '12px 20px', borderRadius: 'var(--radius-sm)', fontSize: '14px',
+    fontWeight: '500', zIndex: '100', animation: 'fadeIn .3s',
+    maxWidth: '400px'
+  });
+  if (type === 'success') {
+    el.style.background = 'rgba(74,222,128,.15)';
+    el.style.border = '1px solid var(--green)';
+    el.style.color = 'var(--green)';
+  } else {
+    el.style.background = 'rgba(248,113,113,.15)';
+    el.style.border = '1px solid var(--red)';
+    el.style.color = 'var(--red)';
+  }
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+function showUserView() {
+  document.getElementById('guestView').style.display = 'none';
+  document.getElementById('userView').style.display = 'block';
+  document.getElementById('userName').textContent = currentUser.username;
+  document.getElementById('userAvatar').textContent = currentUser.username[0].toUpperCase();
+  const badge = document.getElementById('userBadge');
+  badge.textContent = currentUser.role || 'user';
+  badge.className = 'badge ' + (currentUser.role === 'admin' ? 'admin' : 'user');
+}
+
+async function login() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const token = document.getElementById('loginToken').value.trim();
+  const status = document.getElementById('loginStatus');
+
+  if (!username || !password) {
+    status.className = 'status-msg error';
+    status.textContent = 'Please fill in all fields.';
+    return;
+  }
+
+  try {
+    const res = await fetch('users.json');
+    const data = await res.json();
+    const user = (data.users || []).find(u => u.username === username && u.password === password);
+    if (!user) {
+      status.className = 'status-msg error';
+      status.textContent = 'Invalid username or password.';
+      return;
+    }
+
+    currentUser = { username: user.username, role: user.role || 'user' };
+    localStorage.setItem('gita_user', JSON.stringify(currentUser));
+    if (token) localStorage.setItem('gita_token', token);
+
+    status.className = 'status-msg success';
+    status.textContent = 'Logged in!';
+    setTimeout(showUserView, 500);
+  } catch (e) {
+    status.className = 'status-msg error';
+    status.textContent = 'Failed to connect. Try again.';
+  }
+}
+
+function signup() {
+  const username = document.getElementById('signupUser').value.trim();
+  const password = document.getElementById('signupPass').value;
+  const confirm = document.getElementById('signupConfirm').value;
+  const status = document.getElementById('signupStatus');
+
+  if (!username || !password || !confirm) {
+    status.className = 'status-msg error';
+    status.textContent = 'Please fill in all fields.';
+    return;
+  }
+  if (password !== confirm) {
+    status.className = 'status-msg error';
+    status.textContent = 'Passwords do not match.';
+    return;
+  }
+  if (username.length < 3) {
+    status.className = 'status-msg error';
+    status.textContent = 'Username must be at least 3 characters.';
+    return;
+  }
+  if (password.length < 4) {
+    status.className = 'status-msg error';
+    status.textContent = 'Password must be at least 4 characters.';
+    return;
+  }
+
+  const existing = JSON.parse(localStorage.getItem('gita_registered_users') || '[]');
+  if (existing.find(u => u.username === username)) {
+    status.className = 'status-msg error';
+    status.textContent = 'Username already taken.';
+    return;
+  }
+
+  existing.push({ username, password });
+  localStorage.setItem('gita_registered_users', JSON.stringify(existing));
+
+  currentUser = { username, role: 'user' };
+  localStorage.setItem('gita_user', JSON.stringify(currentUser));
+
+  status.className = 'status-msg success';
+  status.textContent = 'Account created!';
+  setTimeout(showUserView, 500);
+}
+
+async function publishPlugin() {
+  const name = document.getElementById('pubName').value.trim();
+  const version = document.getElementById('pubVersion').value.trim();
+  const desc = document.getElementById('pubDesc').value.trim();
+  const lang = document.getElementById('pubLang').value;
+  const url = document.getElementById('pubUrl').value.trim();
+  const tagsStr = document.getElementById('pubTags').value.trim();
+  const status = document.getElementById('publishStatus');
+
+  if (!name || !desc || !url) {
+    status.className = 'status-msg error';
+    status.textContent = 'Name, description, and URL are required.';
+    return;
+  }
+
+  const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+  const installCmd = `gita run PlugInstall ${url} ${name}`;
+
+  const plugin = {
+    name, version: version || '1.0.0', description: desc,
+    author: currentUser.username, url, install_cmd: installCmd,
+    language: lang, tags
+  };
+
+  // Try to save to GitHub via API
+  const token = localStorage.getItem('gita_token');
+  if (token) {
+    try {
+      const getRes = await fetch('https://api.github.com/repos/guyka2212/gita-site/contents/plugins.json', {
+        headers: { Authorization: `token ${token}` }
+      });
+      if (getRes.ok) {
+        const file = await getRes.json();
+        const existing = JSON.parse(decodeURIComponent(escape(atob(file.content))));
+        existing.plugins.push(plugin);
+        const content = JSON.stringify(existing, null, 2);
+        const encoded = btoa(unescape(encodeURIComponent(content)));
+
+        await fetch('https://api.github.com/repos/guyka2212/gita-site/contents/plugins.json', {
+          method: 'PUT',
+          headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: `Add plugin ${name} by ${currentUser.username}`,
+            content: encoded,
+            sha: file.sha
+          })
+        });
+
+        status.className = 'status-msg success';
+        status.textContent = 'Plugin published to registry!';
+        document.getElementById('pubName').value = '';
+        document.getElementById('pubVersion').value = '';
+        document.getElementById('pubDesc').value = '';
+        document.getElementById('pubUrl').value = '';
+        document.getElementById('pubTags').value = '';
+        return;
+      }
+    } catch (e) {
+      // fall through to local save
+    }
+  }
+
+  // Fallback: save locally
+  const local = JSON.parse(localStorage.getItem('gita_local_plugins') || '[]');
+  local.push(plugin);
+  localStorage.setItem('gita_local_plugins', JSON.stringify(local));
+
+  status.className = 'status-msg success';
+  status.textContent = 'Plugin saved locally (no GitHub token — submit again with a token to publish globally).';
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('gita_user');
+  document.getElementById('guestView').style.display = 'block';
+  document.getElementById('userView').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginStatus').className = 'status-msg';
+}
+
+loadState();
+</script>
+
+</body>
+</html>
