@@ -5,10 +5,15 @@
       "version": "1.0.0",
       "description": "Pull project snapshots over Wi-Fi from a remote Gita host running gita run wifi-host. Specify the host IP and snapshot name to download files directly into your current directory.",
       "author": "guyka2212",
-      "url": "https://raw.githubusercontent.com/guyka2212/wifi-pull/main/wifi-pull",
-      "install_cmd": "gita run PlugInstall https://raw.githubusercontent.com/guyka2212/wifi-pull/main/wifi-pull wifi-pull",
+      "url": "https://raw.githubusercontent.com/guyka2212/wifi-pull/master/wifi-pull",
+      "install_cmd": "gita run PlugInstall https://raw.githubusercontent.com/guyka2212/wifi-pull/master/wifi-pull wifi-pull",
       "language": "python",
-      "tags": ["network", "sync", "wifi", "pull"]
+      "tags": [
+        "network",
+        "sync",
+        "wifi",
+        "pull"
+      ]
     }
   ]
 }
