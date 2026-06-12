@@ -8,7 +8,7 @@
       "url": "https://raw.githubusercontent.com/guyka2212/wifi-pull/main/wifi-pull",
       "install_cmd": "gita run PlugInstall https://raw.githubusercontent.com/guyka2212/wifi-pull/main/wifi-pull wifi-pull",
       "language": "python",
-      "tags": []
+      "tags": ["network", "sync", "wifi", "pull"]
     }
   ]
 }

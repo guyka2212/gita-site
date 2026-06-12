@@ -223,11 +223,14 @@ async function loadData() {
   }
 }
 
+const HIDDEN_TAGS = ['network', 'sync', 'wifi', 'pull'];
+
 function populateTagFilter() {
   const tags = new Set();
   plugins.forEach(p => (p.tags || []).forEach(t => tags.add(t)));
   const sel = document.getElementById('tagFilter');
   tags.forEach(t => {
+    if (HIDDEN_TAGS.includes(t)) return;
     const opt = document.createElement('option');
     opt.value = t;
     opt.textContent = t;
