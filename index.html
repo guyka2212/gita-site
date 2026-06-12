@@ -256,6 +256,7 @@
     <div class="btn-group">
       <a href="#install" class="btn btn-primary">Get Started</a>
       <a href="#commands" class="btn btn-secondary">View Commands</a>
+      <a href="#plugins" class="btn btn-secondary">Plugins</a>
       <a href="https://github.com/guyka2212/gita" class="btn btn-secondary" target="_blank">GitHub</a>
     </div>
   </div>
@@ -459,6 +460,88 @@ gita run deploy</pre>
   </div>
 </section>
 
+<!-- Plugins -->
+<section id="plugins">
+  <div class="container">
+    <div class="section-label">Plugins</div>
+    <h2 class="section-title">Plugin developer guide</h2>
+    <p class="section-desc">Because the Gita engine uses an extensionless runner system, you can easily build, install, and share plugins using Bash, Python, or any scripting language.</p>
+
+    <h3 style="font-size:20px;font-weight:600;margin-bottom:16px">📥 How to install plugins</h3>
+
+    <div class="detail">
+      <h4>Method A: Automated installer</h4>
+      <p>If your Gita configuration includes <code>install-plugin</code>, install any remote script instantly from a raw URL:</p>
+      <pre>gita install-plugin https://raw.githubusercontent.com/username/repo/main/my-plugin my-plugin</pre>
+    </div>
+
+    <div class="detail">
+      <h4>Method B: Manual installation</h4>
+      <p>Drop a script directly into your scripts directory:</p>
+      <pre><span class="comment-out">touch ~/.gita/scripts/my-plugin</span>
+<span class="comment-out"># Open in an editor, paste your code, then:</span>
+chmod +x ~/.gita/scripts/my-plugin</pre>
+    </div>
+
+    <h3 style="font-size:20px;font-weight:600;margin:32px 0 16px">🛠️ How to create plugins</h3>
+    <p style="color:var(--text-dim);margin-bottom:20px">Writing a plugin is just writing a script — no extension, a valid shebang, and executable permissions.</p>
+
+    <div class="detail">
+      <h4>Example A: Bash plugin</h4>
+      <p>Save as <code>~/.gita/scripts/workspace-lock</code>:</p>
+      <pre>#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Error: Missing snapshot name."
+    echo "Usage: gita run workspace-lock [snapshot-name]"
+    exit 1
+fi
+
+echo "Freezing directory state..."
+gita push "$1"
+
+echo "Locking down project files to read-only..."
+chmod 444 *
+echo "Finished protecting workspace state."</pre>
+    </div>
+
+    <div class="detail">
+      <h4>Example B: Python plugin</h4>
+      <p>Save as <code>~/.gita/scripts/system-stat</code>:</p>
+      <pre>#!/usr/bin/env python3
+import sys
+import shutil
+
+if len(sys.argv) > 1 and sys.argv[1] == "--help":
+    print("Usage: gita run system-stat")
+    sys.exit(0)
+
+total, used, free = shutil.disk_usage("/")
+free_gb = free // (2**30)
+
+print("Gita Local Infrastructure Report")
+print(f"Storage Remaining: {free_gb} GB Available")</pre>
+    </div>
+
+    <h3 style="font-size:20px;font-weight:600;margin:32px 0 16px">🚀 How to publish & share plugins</h3>
+
+    <div class="steps" style="grid-template-columns:repeat(3,1fr)">
+      <div class="step">
+        <div class="step-num">Step 1</div>
+        <p>Create a <strong>public GitHub repo</strong> (e.g. <code>gita-plugins</code>) and add your extensionless script files.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 2</div>
+        <p>Open your script file on GitHub, click the <strong>"Raw"</strong> button, and copy the URL.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 3</div>
+        <p>Share the raw link. Users install with:<br><code>gita install-plugin &lt;raw-url&gt; &lt;name&gt;</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Requirements -->
 <section>
   <div class="container">
@@ -489,6 +572,7 @@ gita run deploy</pre>
     <p style="margin-top:8px">
       <a href="#install">Install</a> •
       <a href="#commands">Commands</a> •
+      <a href="#plugins">Plugins</a> •
       <a href="#extending">Extending</a> •
       <a href="https://github.com/guyka2212/gita" target="_blank">GitHub</a>
     </p>
