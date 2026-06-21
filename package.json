@@ -1,0 +1,9 @@
+{
+  "name": "gita-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gita — Portable project snapshots, templates & automation",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
